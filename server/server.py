@@ -15,10 +15,8 @@ def index():
 
 
 @app.route("/fetch-objects/<string:obj>", methods=["GET"])
-# @cross_origin(origin='*', supports_credentials=True, headers=['Content- Type', 'Authorization'])
 def fetch_json_object(obj):
     """Retrieve user selection json obj type to run through network."""
-    print("HOLA")
     if obj == "sin":
         payload = load_sin_data()
     else:
@@ -29,14 +27,14 @@ def fetch_json_object(obj):
 
     payload_decoded = json.loads(payload, object_hook=nndata_deserializer)
     # Add network info to the session.
-    _create_network(len(payload_decoded.x), len(payload_decoded.y))
-
+    _save_network_specifications(
+        len(payload_decoded.x[0]), len(payload_decoded.y[0]))
+    
     return response(status=200, payload=payload)
 
 
 @app.route("/fetch-current-layer", methods=["GET"])
-# @cross_origin(origin='*', supports_credentials=True, headers=['Content- Type', 'Authorization'])
-def get_current_layer():
+def get_current_layer_info():
     """Retrieve current layer."""
     network = _get_network_from_session()
     curr_layer = network.layers.current
@@ -47,19 +45,22 @@ def get_current_layer():
     return response(status=200, payload=payload)
 
 
-def _create_network(x, y):
-    """Helper to create the network for user selected object."""
+def _save_network_specifications(x, y):
+    """Helper to save the network to session for user selected object."""
     # add network info to session
-    session["x"] = x
-    session["y"] = y
+    session["num_inputs"] = x
+    session["num_outputs"] = y
     session["current_layer"] = 0
 
     # List of hidden layers, where the value is the number of neurodes.
     session["hidden_layers"] = [3]
+    print("SESSION NUM INPUTS", session["num_inputs"])
+    print("SESSION NUM OUTPUTS", session["num_outputs"])
+    print("current layer", session["current_layer"])
 
 
 def _get_network_from_session():
-    network = FFBPNetwork(session["x"], session["y"])
+    network = FFBPNetwork(session["num_inputs"], session["num_outputs"])
     # Add all of the hidden layers.
     for num_neurodes in session["hidden_layers"]:
         network.add_hidden_layer(num_neurodes)

@@ -43,7 +43,7 @@ class Layer(DLLNode):
 
 
 class LayerList(DoublyLinkedList):
-    """Class to handle adding and removing layers."""
+    """Class to handle adding and removing hidden layers."""
 
     def __init__(self, num_inputs, num_outputs):
         """LayerList constructor."""

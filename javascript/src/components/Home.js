@@ -1,4 +1,5 @@
 import * as api from "../api.js";
+import Network from "./Network";
 import React from "react";
 
 class Home extends React.Component {
@@ -7,6 +8,8 @@ class Home extends React.Component {
         this.state = {
             objectType: "",
             loadedObject: null,
+            layers: [],
+            showNetwork: false,
         };
     }
 
@@ -24,15 +27,45 @@ class Home extends React.Component {
                             ...this.state,
                             loadedObject: json,
                         });
+                        this.updateLayers(json.__NNData__);
+                    });
+                } else {
+                    this.setState({
+                        ...this.state,
+                        loadedObject: null,
+                        layers: [],
+                        showNetwork: false,
                     });
                 }
             },
         );
     };
 
+    updateLayers = (obj) => {
+        let layers = [...this.state.layers];
+        if (layers.length === 0) {
+            console.log(obj);
+            // num neurodes in input is the length of item in x
+            layers.push({ layerType: "Input", numNeurodes: obj.x[0].length });
+            // num neurodes in output is the length of an item in y
+            layers.push({ layerType: "Output", numNeurodes: obj.y[0].length });
+        }
+        this.setState({
+            ...this.state,
+            layers: layers,
+        });
+    };
+
     fetchCurrentLayer = () => {
         api.fetchCurrentLayer().then((layer) => {
             console.log(layer);
+        });
+    };
+
+    renderNetwork = () => {
+        this.setState({
+            ...this.state,
+            showNetwork: true,
         });
     };
 
@@ -59,14 +92,17 @@ class Home extends React.Component {
                     {this.state.loadedObject && (
                         <div>
                             <div>
-                                {`Ready to go.  ${
+                                {`Got it. We'll pass  ${
                                     this.state.objectType
-                                } loaded`}
+                                } data to the network`}
                                 .
                             </div>
-                            <button onClick={this.fetchCurrentLayer}>
+                            <button onClick={this.renderNetwork}>
                                 Browse network
                             </button>
+                            {this.state.showNetwork && (
+                                <Network layers={this.state.layers} />
+                            )}
                         </div>
                     )}
                 </div>
