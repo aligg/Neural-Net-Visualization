@@ -61,7 +61,7 @@ export function runNetwork(blob) {
         credentials: "include",
     })
         .then((response) => {
-            console.log("Training done.");
+            console.log("success", response);
         })
         .catch(ERROR_CALLBACK);
 }
