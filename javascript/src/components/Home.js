@@ -8,8 +8,10 @@ class Home extends React.Component {
         this.state = {
             objectType: "",
             loadedObject: null,
+            hiddenLayers: [1, 2, 3],
             layers: [],
             showNetwork: false,
+            epochs: 1000,
         };
     }
 
@@ -53,6 +55,16 @@ class Home extends React.Component {
         this.setState({
             ...this.state,
             layers: layers,
+        });
+    };
+
+    runNetwork = () => {
+        const blob = {
+            epochs: this.state.epochs,
+            hiddenLayers: this.state.hiddenLayers,
+        };
+        api.runNetwork(blob).then((result) => {
+            console.log(result);
         });
     };
 
@@ -103,6 +115,9 @@ class Home extends React.Component {
                             {this.state.showNetwork && (
                                 <Network layers={this.state.layers} />
                             )}
+                            <button onClick={this.runNetwork}>
+                                Run network
+                            </button>
                         </div>
                     )}
                 </div>

@@ -41,7 +41,7 @@ export function fetchJSONObjects(obj) {
         .catch(ERROR_CALLBACK);
 }
 
-export function fetchCurrentLayer(obj) {
+export function fetchCurrentLayer() {
     let hdrs = headers(methods.GET);
     return fetch(`${ENGINE_URI}/fetch-current-layer`, {
         method: methods.GET,
@@ -49,5 +49,19 @@ export function fetchCurrentLayer(obj) {
         credentials: "include",
     })
         .then(JSON_CALLBACK)
+        .catch(ERROR_CALLBACK);
+}
+
+export function runNetwork(blob) {
+    const str = JSON.stringify(blob);
+    let hdrs = headers(methods.GET);
+    return fetch(`${ENGINE_URI}/run-network/${str}`, {
+        method: methods.GET,
+        headers: hdrs,
+        credentials: "include",
+    })
+        .then((response) => {
+            console.log("Training done.");
+        })
         .catch(ERROR_CALLBACK);
 }

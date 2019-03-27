@@ -4,6 +4,7 @@ from flask_cors import CORS
 from NNDataSerialization import (load_sin_data, load_xor_data,
                                  nndata_deserializer, NNDataSerializer)
 from FFBPNetwork import FFBPNetwork
+from NNData import NNData
 
 app = Flask(__name__, template_folder="../javascript/public")
 CORS(app, origins=["http://localhost:3000"], supports_credentials=True)
@@ -29,8 +30,19 @@ def fetch_json_object(obj):
     # Add network info to the session.
     _save_network_specifications(
         len(payload_decoded.x[0]), len(payload_decoded.y[0]))
-    
+
     return response(status=200, payload=payload)
+
+
+@app.route("/run-network/<blob>", methods=["GET"])
+def run_network(blob):
+    """Send network specifications"""
+    data = json.loads(blob)
+    epochs = data["epochs"]
+    hidden_layers = data["hiddenLayers"]
+    session["hidden_layers"] = hidden_layers
+    _run_network(epochs)
+    return response(200)
 
 
 @app.route("/fetch-current-layer", methods=["GET"])
@@ -50,13 +62,9 @@ def _save_network_specifications(x, y):
     # add network info to session
     session["num_inputs"] = x
     session["num_outputs"] = y
-    session["current_layer"] = 0
 
     # List of hidden layers, where the value is the number of neurodes.
-    session["hidden_layers"] = [3]
-    print("SESSION NUM INPUTS", session["num_inputs"])
-    print("SESSION NUM OUTPUTS", session["num_outputs"])
-    print("current layer", session["current_layer"])
+    session["hidden_layers"] = []
 
 
 def _get_network_from_session():
@@ -64,13 +72,18 @@ def _get_network_from_session():
     # Add all of the hidden layers.
     for num_neurodes in session["hidden_layers"]:
         network.add_hidden_layer(num_neurodes)
-    # Get to the current layer.
-    for _ in range(session["current_layer"]):
-        network.layers.iterate()
     return network
 
 
-def response(status, payload):
+def _run_network(epochs):
+    """Helper to structure data and run the network."""
+
+    network = _get_network_from_session()
+    data = json.loads(session["data"], object_hook=nndata_deserializer)
+    network.train(data, epochs, order=NNData.Order.RANDOM)
+
+
+def response(status, payload=None):
     """Response helper to craft a Flask JSON response"""
     mimetype = "application/json"
     rsp = Response(response=payload, status=status, mimetype=mimetype)
