@@ -1,6 +1,5 @@
 from flask import (Flask, json, Response, request, render_template, session)
 from flask_cors import CORS
-# from flask.ext.session import Session
 from NNDataSerialization import (load_sin_data, load_xor_data,
                                  nndata_deserializer, NNDataSerializer)
 from FFBPNetwork import FFBPNetwork
@@ -36,7 +35,11 @@ def fetch_json_object(obj):
 
 @app.route("/run-network/<blob>", methods=["GET"])
 def run_network(blob):
-    """Send network specifications"""
+    """Receive user specified network specifications then run network.
+        Expecting user to specify: 
+         - numb of hidden layers + num neurodes in each
+         - epochs
+    """
     data = json.loads(blob)
     epochs = data["epochs"]
     hidden_layers = data["hiddenLayers"]
@@ -45,6 +48,7 @@ def run_network(blob):
     return response(200)
 
 
+# un-used currently
 @app.route("/fetch-current-layer", methods=["GET"])
 def get_current_layer_info():
     """Retrieve current layer."""

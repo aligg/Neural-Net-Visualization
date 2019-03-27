@@ -28,8 +28,11 @@ class Network extends React.Component {
         });
         return layersJSX;
     };
+    // ToDo: allow user to navigate between layers (toggling current underline)
+    // ToDo: if allowed for current layer, allow user to add next hidden layer
+    // ToDo: if allowed for current layer, allow user to remove hiddne layer
+    // Update state accordingly for all above
     render() {
-        console.log("network", this.props);
         return (
             <div
                 style={{

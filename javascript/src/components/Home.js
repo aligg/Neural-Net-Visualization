@@ -8,10 +8,10 @@ class Home extends React.Component {
         this.state = {
             objectType: "",
             loadedObject: null,
-            hiddenLayers: [1, 2, 3],
+            hiddenLayers: [1, 2, 3], // hard coding for now
             layers: [],
             showNetwork: false,
-            epochs: 1000,
+            epochs: 1000, // hard coding for now
         };
     }
 
@@ -46,7 +46,6 @@ class Home extends React.Component {
     updateLayers = (obj) => {
         let layers = [...this.state.layers];
         if (layers.length === 0) {
-            console.log(obj);
             // num neurodes in input is the length of item in x
             layers.push({ layerType: "Input", numNeurodes: obj.x[0].length });
             // num neurodes in output is the length of an item in y
@@ -65,12 +64,8 @@ class Home extends React.Component {
         };
         api.runNetwork(blob).then((result) => {
             console.log(result);
-        });
-    };
-
-    fetchCurrentLayer = () => {
-        api.fetchCurrentLayer().then((layer) => {
-            console.log(layer);
+            // ToDo: show user some sort of indication running in progress
+            // ToDo: use result to let user know training complete
         });
     };
 

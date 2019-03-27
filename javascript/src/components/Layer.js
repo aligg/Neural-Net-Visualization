@@ -32,7 +32,6 @@ class Layer extends React.Component {
     };
 
     render() {
-        console.log(this.props.current);
         return (
             <div
                 style={{
